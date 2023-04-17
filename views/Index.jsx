@@ -13,6 +13,7 @@ function Index(props) {
             <form action={`/logs/${log._id}?_method=DELETE`} method="POST">
               <button type="submit">Delete</button>
             </form>
+            <a href={`/logs/${log._id}/edit`}>Edit</a>
           </li>
         ))}
       </ul>

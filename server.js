@@ -6,7 +6,7 @@ const Log = require('./models/logs');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const app = express();
-const PORT = process.env.PORT || 3003
+const PORT = process.env.PORT || 3007
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/captains_log';
 
 // set up mongoose connection
@@ -63,26 +63,31 @@ app.delete('/logs/:id', (req, res) => {
   });
 });
 
+app.get('/logs/:id/edit', async (req, res) => {
+  const log = await Logs.findById(req.params.id);
+  res.render('Edit', { log });
+});
 
-app.post('/logs', (req, res) => {
+
+app.post('/logs', async (req, res) => {
   const { title, entry, shipIsBroken } = req.body;
-  const isShipBroken = (shipIsBroken === 'true');  
-
+  const isShipBroken = (shipIsBroken === 'true');
+  
   const log = new Log({
     title,
     entry,
     shipIsBroken: isShipBroken  
   });
 
-  log.save((err, savedLog) => {
-    if (err) {
-      console.warn(err);
-      return res.status(500).send(err);
-    }
-
+  try {
+    const savedLog = await log.save();
     res.redirect('/logs');
-  });
+  } catch (err) {
+    console.warn(err);
+    return res.status(500).send(err);
+  }
 });
+
 
 // start server
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
